@@ -6,9 +6,8 @@ import br.com.luizera.screenmatch.model.DadosTemporada;
 import br.com.luizera.screenmatch.service.ConsumoApi;
 import br.com.luizera.screenmatch.service.ConverteDados;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Principal {
     private Scanner scanner = new Scanner(System.in);
@@ -37,14 +36,28 @@ public class Principal {
             temporadas.add(dadosTemporada);
         }
         temporadas.forEach(System.out::println);
-//
-//        for (int i = 0; i < dadosSerie.totalTemporadas(); i++) {
-//            List<DadosEpisodio> episodiosTemporada  = temporadas.get(i).episodios();
-//            for (int j = 0; j < episodiosTemporada.size(); j ++){
-//                System.out.println(episodiosTemporada.get(j).titulo());
-//            }
-//        }
+
+        for (int i = 0; i < dadosSerie.totalTemporadas(); i++) {
+            List<DadosEpisodio> episodiosTemporada  = temporadas.get(i).episodios();
+            for (int j = 0; j < episodiosTemporada.size(); j ++){
+                System.out.println(episodiosTemporada.get(j).titulo());
+            }
+        }
 
         temporadas.forEach(t -> t.episodios().forEach(e -> System.out.println(e.titulo())));
+
+
+//        Exemplo de Stream
+//        List<Integer> numbers = Arrays.asList(5, 10, 2, 40, 33, 9, 12);
+//
+//        numbers.stream().sorted().forEach(System.out::println);
+
+        List<DadosEpisodio> dadosEpisodios = temporadas.stream().flatMap(t -> t.episodios().stream()).collect(Collectors.toList());
+
+        System.out.println("TOP 5 EPISODIOS DA SERIE " + serieName.toUpperCase());
+        dadosEpisodios.stream().filter(e -> !e.avaliacao()
+                .equalsIgnoreCase("N/A"))
+                .sorted(Comparator.comparing(DadosEpisodio::avaliacao).reversed())
+                .limit(5).forEach(System.out::println);
     }
 }
